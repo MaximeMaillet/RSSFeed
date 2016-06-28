@@ -43,8 +43,6 @@ public class ArticleDetailFragment extends Fragment {
         if(article.getImage_url() == null) {
             article.setImage_url("http://vignette3.wikia.nocookie.net/shokugekinosoma/images/6/60/No_Image_Available.png/revision/latest?cb=20150708082716");
         }
-        Picasso.with(getContext()).load(article.getImage_url())
-                .transform(new RoundedTransformation(0, 5))
-                .into(this.image);
+        Picasso.with(getContext()).load(article.getImage_url()).into(this.image);
     }
 }

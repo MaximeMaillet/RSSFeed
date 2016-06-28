@@ -17,8 +17,7 @@ import maillet.maxime.rssfeed.R;
 public class ArticleListFragment extends Fragment implements OnClickListener {
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_article_list, container, false);
         return view;
     }

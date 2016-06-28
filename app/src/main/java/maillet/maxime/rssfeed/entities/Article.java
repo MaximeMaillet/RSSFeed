@@ -1,14 +1,13 @@
 package maillet.maxime.rssfeed.entities;
 
-import android.media.Image;
-
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by maxime on 28/06/2016.
  */
 public class Article implements Serializable {
+
+    private static final long serialVersionUID = -29238982928391L;
 
     private static int nb_article = 0;
 

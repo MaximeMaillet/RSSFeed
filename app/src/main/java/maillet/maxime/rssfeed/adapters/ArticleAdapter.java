@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 
 import maillet.maxime.rssfeed.R;
 import maillet.maxime.rssfeed.entities.Article;
-import maillet.maxime.rssfeed.ui.RoundedTransformation;
 
 /**
  * Created by maxime on 28/06/2016.
@@ -42,9 +40,7 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
         if(article.getImage_url() == null) {
             article.setImage_url("http://vignette3.wikia.nocookie.net/shokugekinosoma/images/6/60/No_Image_Available.png/revision/latest?cb=20150708082716");
         }
-        Picasso.with(convertView.getContext()).load(article.getImage_url())
-                .transform(new RoundedTransformation(0, 5))
-                .into(imageView);
+        Picasso.with(convertView.getContext()).load(article.getImage_url()).into(imageView);
 
         return convertView;
     }
