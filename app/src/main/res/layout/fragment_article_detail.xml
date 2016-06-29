@@ -59,6 +59,7 @@
         android:layout_height="wrap_content"
         android:text="@string/article_read"
         android:id="@+id/article_read"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp" />
 
 </LinearLayout>

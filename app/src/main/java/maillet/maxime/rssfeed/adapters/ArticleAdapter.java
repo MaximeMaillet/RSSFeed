@@ -36,16 +36,16 @@ public class ArticleAdapter extends ArrayAdapter<Article> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_article, parent, false);
         }
 
-        TextView tvName = (TextView) convertView.findViewById(R.id.tvName);
-        TextView tvHome = (TextView) convertView.findViewById(R.id.tvHome);
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.imageView);
+        TextView title = (TextView) convertView.findViewById(R.id.article_list_title);
+        TextView description = (TextView) convertView.findViewById(R.id.article_list_description);
+        ImageView image = (ImageView) convertView.findViewById(R.id.article_list_image);
 
-        tvName.setText(article.getTitle());
-        tvHome.setText(article.getDescription());
+        title.setText(article.getTitle());
+        description.setText(article.getDescription());
         if(article.getImage_url() == null) {
-            article.setImage_url("http://vignette3.wikia.nocookie.net/shokugekinosoma/images/6/60/No_Image_Available.png/revision/latest?cb=20150708082716");
+            article.setImage_url(Article.noImage);
         }
-        Picasso.with(convertView.getContext()).load(article.getImage_url()).into(imageView);
+        Picasso.with(convertView.getContext()).load(article.getImage_url()).into(image);
 
         return convertView;
     }

@@ -66,7 +66,7 @@ public class ArticleDetailFragment extends Fragment {
     public void update(final Article article) {
         this.title.setText(article.getTitle());
         this.description.setText(article.getDescription());
-        this.publication_date.setText(article.getPublication_date()+" >> "+article.getUrl());
+        this.publication_date.setText(article.getPublication_date());
         if(article.getImage_url() == null) {
             article.setImage_url(Article.noImage);
         }
