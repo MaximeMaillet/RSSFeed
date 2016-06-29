@@ -16,6 +16,7 @@ import com.crazyhitty.chdev.ks.rssmanager.OnRssLoadListener;
 import com.crazyhitty.chdev.ks.rssmanager.RssItem;
 import com.crazyhitty.chdev.ks.rssmanager.RssReader;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
@@ -62,8 +63,7 @@ public class ArticleListActivity extends AppCompatActivity implements OnRssLoadL
         this.adapter = new ArticleAdapter(this, list);
         article_list.setAdapter(this.adapter);
 
-        ArticleList.load(getApplicationContext(), ArticleList.filename);
-        this.loadFeeds(rssFeedUrl);
+        this.load();
 
         article_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -76,6 +76,20 @@ public class ArticleListActivity extends AppCompatActivity implements OnRssLoadL
                 startActivity(intent);
             }
         });
+    }
+
+    /**
+     * Method which manage loading data
+     */
+    private void load() {
+        File dir = getFilesDir();
+        File file = new File(dir, ArticleList.filename);
+
+        if(file.exists()) {
+            ArticleList.load(getApplicationContext(), ArticleList.filename);
+        }
+
+        this.loadFeeds(rssFeedUrl);
     }
 
     /**
