@@ -20,6 +20,11 @@ import maillet.maxime.rssfeed.entities.Article;
  */
 public class ArticleAdapter extends ArrayAdapter<Article> {
 
+    /**
+     * Constructor
+     * @param context
+     * @param users
+     */
     public ArticleAdapter(Context context, ArrayList<Article> users) {
         super(context, 0, users);
     }

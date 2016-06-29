@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">RssFeed</string>
+    <string name="article_read">Lire l\'article</string>
 </resources>

@@ -1,7 +1,11 @@
 package maillet.maxime.rssfeed.ui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 
 import maillet.maxime.rssfeed.R;
@@ -13,6 +17,12 @@ import maillet.maxime.rssfeed.models.ArticleList;
  * Created by maxime on 28/06/2016.
  */
 public class ArticleDetailActivity extends Activity {
+
+    /**
+     * Article loaded from click by User on listView
+     */
+    private Article article = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,20 +31,15 @@ public class ArticleDetailActivity extends Activity {
 
         if (extras != null) {
             int article_ID = extras.getInt("ID");
-            ArticleDetailFragment detailFragment = (ArticleDetailFragment) getFragmentManager()
-                    .findFragmentById(R.id.detailFragment);
-
-            Article article_target = null;
+            ArticleDetailFragment detailFragment = (ArticleDetailFragment) getFragmentManager().findFragmentById(R.id.detailFragment);
 
             ArticleList list = ArticleList.getInstance();
-            for(int i=0; i<list.size(); i++) {
-                Article art = list.get(i);
-                if(art.getID() == article_ID)
-                    article_target = art;
-            }
+            this.article = list.findByID(article_ID);
 
-            if(article_target != null)
-                detailFragment.update(article_target);
+
+            if(this.article != null) {
+                detailFragment.update(this.article);
+            }
         }
     }
 }

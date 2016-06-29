@@ -1,17 +1,11 @@
 package maillet.maxime.rssfeed.models;
 
-import android.util.Log;
-import android.widget.Toast;
-
-import java.io.File;
+import android.content.Context;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 
 import maillet.maxime.rssfeed.entities.Article;
@@ -21,20 +15,109 @@ import maillet.maxime.rssfeed.entities.Article;
  */
 public class ArticleList extends ArrayList<Article> {
 
+    /**
+     * Singleton
+     * Unique instance of ArticleList
+     */
     private static ArticleList instance;
-    private static String filename = "articles.srl";
+
+    /**
+     * Number of article in list
+     */
+    public static int nb_article = 0;
+
+    /**
+     * Name of saving file
+     */
+    public static String filename = "articles.srl";
+
+    /**
+     * Singleton
+     * Static method to access to ArticleList instance
+     * @return ArticleList
+     */
     public static ArticleList getInstance() {
         if(instance == null)
             instance = new ArticleList();
         return instance;
     }
 
-    private File pathToSave;
+    /**
+     * Static method to save data in file
+     *
+     * @param context
+     * @param key
+     */
+    public static void save(Context context, String key) {
+        FileOutputStream fos = null;
+        ObjectOutputStream oos = null;
+        try {
+            fos = context.openFileOutput(key, Context.MODE_PRIVATE);
+            oos = new ObjectOutputStream(fos);
+            ArticleList list = ArticleList.getInstance();
 
-    public ArticleList() {
-        this.load();
+            for(int i=0; i<list.size(); i++)
+                oos.writeObject(list.get(i));
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(oos != null)
+                    oos.close();
+                if(fos != null)
+                    fos.close();
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
+    /**
+     * Static method to read data from file
+     *
+     * @param context
+     * @param key
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static void load(Context context, String key) {
+        FileInputStream fis = null;
+        ObjectInputStream ois = null;
+        try {
+            fis = context.openFileInput(key);
+            ois = new ObjectInputStream(fis);
+            Object art = null;
+
+            while((art = ois.readObject()) != null)
+                ArticleList.getInstance().add((Article) art);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        catch(ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(fis != null)
+                    fis.close();
+                if(ois != null)
+                    ois.close();
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Method which override add method for test if object is already in ArticleList
+     * @param object
+     * @return boolean
+     */
     @Override
     public boolean add(Article object) {
 
@@ -51,62 +134,18 @@ public class ArticleList extends ArrayList<Article> {
             return true;
     }
 
-    public void setPathToSave(File pathToSave) {
-        this.pathToSave = pathToSave;
-    }
-
-    public void save() {
-        String filename = ArticleList.filename;
-        ObjectOutputStream out = null;
-
-        try {
-            out = new ObjectOutputStream(new FileOutputStream(new File(this.pathToSave, ArticleList.filename)));
-            for(int i=0; i<this.size(); i++)
-                out.writeObject(this.get(i));
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    /**
+     * Returns an Article if it exists
+     *
+     * @param ID
+     * @return Article
+     */
+    public Article findByID(int ID) {
+        for(int i=0; i<this.size(); i++) {
+            Article art = this.get(i);
+            if(art.getID() == ID)
+                return art;
         }
-        finally {
-            try {
-                if(out != null)
-                    out.close();
-            }
-            catch(IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void load() {
-        ObjectInputStream input = null;
-        String filename = ArticleList.filename;
-
-        try {
-            input = new ObjectInputStream(new FileInputStream(new File(this.pathToSave, ArticleList.filename)));
-            Object art = null;
-            while((art = input.readObject()) != null)
-                this.add((Article) art);
-
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        finally {
-            try {
-                if(input != null)
-                    input.close();
-            }
-            catch(IOException e) {
-                e.printStackTrace();
-            }
-        }
+        return null;
     }
 }

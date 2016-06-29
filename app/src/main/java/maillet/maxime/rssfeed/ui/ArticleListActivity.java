@@ -1,7 +1,11 @@
 package maillet.maxime.rssfeed.ui;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,23 +29,43 @@ import maillet.maxime.rssfeed.models.ArticleList;
  */
 public class ArticleListActivity extends AppCompatActivity implements OnRssLoadListener {
 
-    private ListView article_list;
+    /**
+     * Link to RSS feed
+     */
+    public static String rssFeedUrl = "http://www.lemonde.fr/m-actu/rss_full.xml";
 
+    /**
+     * Adapter for ListView, contains list of article
+     */
     private ArticleAdapter adapter;
+
+    /**
+     * Layout for pull-to-refresh
+     */
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.article_list = (ListView) findViewById(R.id.article_list);
-        ArticleList list = ArticleList.getInstance();
-        list.setPathToSave(getFilesDir());
-        this.adapter = new ArticleAdapter(this, list);
-        this.article_list.setAdapter(this.adapter);
-        //this.loadFeeds("http://www.lemonde.fr/m-actu/rss_full.xml");
+        this.swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        this.swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshFeeds(ArticleListActivity.rssFeedUrl);
+            }
+        });
 
-        this.article_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        final ListView article_list = (ListView) findViewById(R.id.article_list);
+        ArticleList list = ArticleList.getInstance();
+        this.adapter = new ArticleAdapter(this, list);
+        article_list.setAdapter(this.adapter);
+
+        ArticleList.load(getApplicationContext(), ArticleList.filename);
+        this.loadFeeds(rssFeedUrl);
+
+        article_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getApplicationContext(), ArticleDetailActivity.class);
@@ -54,14 +78,36 @@ public class ArticleListActivity extends AppCompatActivity implements OnRssLoadL
         });
     }
 
+    /**
+     * Load RSS feed from network
+     * @param url
+     */
     private void loadFeeds(String url) {
-        String[] urlArr = {url};
-        new RssReader(ArticleListActivity.this).showDialog(true).urls(urlArr).parse(this);
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if(activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            String[] urlArr = {url};
+            new RssReader(ArticleListActivity.this).showDialog(true).urls(urlArr).parse(this);
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Pas de connexion internet", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Load RSS feed from network
+     * Only for pull-to-refresh
+     * @param url
+     */
+    private void refreshFeeds(String url) {
+        this.loadFeeds(url);
+        swipeContainer.setRefreshing(false);
     }
 
     @Override
     public void onFailure(String message) {
-        Toast.makeText(ArticleListActivity.this, "Error: "+message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(ArticleListActivity.this, "Impossible de charger le flux RSS", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -72,11 +118,10 @@ public class ArticleListActivity extends AppCompatActivity implements OnRssLoadL
 
         while(iter.hasNext()) {
             RssItem item = iter.next();
-            Article article = new Article(item.getTitle(), item.getDescription(), item.getPubDate(), item.getImageUrl());
+            Article article = new Article(item.getTitle(), item.getDescription(), item.getPubDate(), item.getImageUrl(), item.getLink());
             article_list.add(article);
         }
-
-        article_list.save();
+        ArticleList.save(getApplicationContext(), ArticleList.filename);
         this.adapter.addAll(article_list);
     }
 }
